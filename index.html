@@ -3,61 +3,515 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project</title>
+    <title>Batman Interface</title>
     <style>
+        :root {
+            --bg-main: #020308;
+            --bg-secondary: #050816;
+            --accent-gold: #f6d365;
+            --accent-gold-deep: #fda085;
+            --accent-blue: #46a6ff;
+            --text-primary: #f5f5f5;
+            --text-muted: #7f8c8d;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
+            margin: 0;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
+            background:
+                radial-gradient(circle at 50% 0%, #202533 0, transparent 55%),
+                radial-gradient(circle at 0% 100%, #151824 0, transparent 55%),
+                radial-gradient(circle at 100% 100%, #111622 0, transparent 55%),
+                #000000;
+            color: var(--text-primary);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            overflow: hidden;
+        }
+
+        /* Fullscreen container */
+        .batman-ui {
+            position: relative;
+            width: 100%;
             height: 100vh;
-            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+            overflow: hidden;
+        }
+
+        /* Cinematic vignette */
+        .batman-ui::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 50% -10%, transparent 0, transparent 35%, rgba(0, 0, 0, 0.8) 85%),
+                radial-gradient(circle at 50% 110%, transparent 0, transparent 30%, rgba(0, 0, 0, 0.95) 90%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Scanline / noise overlay */
+        .batman-ui::after {
+            content: "";
+            position: absolute;
+            inset: -50px;
+            background-image: linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
+            background-size: 100% 2px;
+            opacity: 0.2;
+            mix-blend-mode: soft-light;
+            pointer-events: none;
+            z-index: 1;
+            animation: scanlineMove 8s linear infinite;
+        }
+
+        @keyframes scanlineMove {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(20px); }
+        }
+
+        /* Center content */
+        .center-stack {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+            max-width: 700px;
             text-align: center;
-            font-size: 24px;
+            padding: 0 10px;
         }
 
-        .content {
-            font-size: 30px;
-            display: block;
+        .hud-title {
+            font-size: 14px;
+            letter-spacing: 0.5em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            opacity: 0.7;
         }
 
-        .blocked {
-            display: none;
-            font-size: 30px;
-            color: red;
-            font-weight: bold;
+        .hud-divider {
+            width: 220px;
+            height: 1px;
+            background: linear-gradient(
+                to right,
+                transparent,
+                rgba(255,255,255,0.5),
+                transparent
+            );
+            position: relative;
+            overflow: visible;
         }
 
-        /* Hide content on mobile screens */
-        @media (max-width: 1024px) {
-            .content { display: none !important; }
-            .blocked { display: block !important; }
+        .hud-divider::before,
+        .hud-divider::after {
+            content: "";
+            position: absolute;
+            top: -2px;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #ffffff 0, #ffd27f 40%, transparent 70%);
+            box-shadow: 0 0 15px rgba(255, 210, 127, 0.7);
+        }
+
+        .hud-divider::before {
+            left: 25%;
+        }
+
+        .hud-divider::after {
+            right: 25%;
+        }
+
+        /* Logo container */
+        .logo-wrapper {
+            position: relative;
+            width: min(420px, 90vw);
+            aspect-ratio: 16 / 9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            perspective: 1500px;
+        }
+
+        .logo-base-glow {
+            position: absolute;
+            width: 120%;
+            height: 160%;
+            background:
+                radial-gradient(circle at 50% 40%, rgba(255, 215, 128, 0.25) 0, transparent 55%),
+                radial-gradient(circle at 50% 65%, rgba(80, 119, 255, 0.18) 0, transparent 60%);
+            filter: blur(18px);
+            opacity: 0.9;
+            mix-blend-mode: screen;
+        }
+
+        .logo-border {
+            position: absolute;
+            inset: 0;
+            border-radius: 40px;
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(255, 255, 255, 0.18),
+                    rgba(255, 214, 165, 0.05),
+                    rgba(40, 60, 120, 0.25)
+                );
+            padding: 3px;
+            backdrop-filter: blur(14px);
+        }
+
+        .logo-inner {
+            position: relative;
+            border-radius: 36px;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(circle at 50% 0%, #232b3b 0, #050815 50%, #020307 100%);
+            overflow: hidden;
+            box-shadow:
+                0 0 40px rgba(0, 0, 0, 0.85),
+                0 0 80px rgba(0, 0, 0, 1);
+        }
+
+        .logo-half {
+            position: absolute;
+            top: 50%;
+            width: 52%;
+            transform: translateY(-50%);
+            height: 70%;
+            background-image: url("batman-logo.png"); /* Replace with realistic Batman logo */
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+            filter:
+                drop-shadow(0 0 18px rgba(0, 0, 0, 0.95))
+                drop-shadow(0 0 35px rgba(255, 230, 150, 0.45));
+            transition:
+                transform 1.1s cubic-bezier(0.23, 1, 0.32, 1),
+                opacity 0.9s ease;
+        }
+
+        .logo-half.left {
+            left: 0;
+            transform-origin: center right;
+            clip-path: inset(0 50% 0 0);
+        }
+
+        .logo-half.right {
+            right: 0;
+            transform-origin: center left;
+            clip-path: inset(0 0 0 50%);
+        }
+
+        /* Faint grid inside card */
+        .logo-inner::before {
+            content: "";
+            position: absolute;
+            inset: -50%;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+            background-size: 40px 40px;
+            opacity: 0.4;
+            mix-blend-mode: soft-light;
+            transform: translate3d(0, 0, 0);
+        }
+
+        /* Center beam when opened */
+        .center-beam {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 0;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateX(-50%);
+            transition:
+                opacity 0.9s ease 0.2s,
+                width 0.9s ease 0.2s;
+        }
+
+        .center-beam::before {
+            content: "";
+            position: absolute;
+            top: 15%;
+            bottom: 15%;
+            left: 50%;
+            width: 1px;
+            transform: translateX(-50%);
+            background:
+                linear-gradient(
+                    to bottom,
+                    transparent,
+                    rgba(255, 255, 255, 0.85),
+                    rgba(255, 223, 164, 0.7),
+                    rgba(78, 139, 255, 0.5),
+                    transparent
+                );
+            box-shadow:
+                0 0 25px rgba(255, 255, 255, 0.8),
+                0 0 55px rgba(255, 214, 165, 0.7),
+                0 0 80px rgba(76, 143, 255, 0.6);
+        }
+
+        /* "I AM BACK" panel */
+        .return-panel {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+            opacity: 0;
+            transform: scale(0.95);
+            transition:
+                opacity 0.85s ease 0.25s,
+                transform 0.85s cubic-bezier(0.23, 1, 0.32, 1) 0.25s;
+        }
+
+        .return-text {
+            font-size: 28px;
+            letter-spacing: 0.45em;
+            text-transform: uppercase;
+            text-indent: 0.45em;
+            background: linear-gradient(
+                120deg,
+                var(--accent-gold),
+                var(--accent-gold-deep),
+                #ffffff
+            );
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            text-shadow:
+                0 0 18px rgba(0, 0, 0, 0.85),
+                0 0 32px rgba(255, 214, 165, 0.6);
+        }
+
+        .return-logo {
+            width: 42%;
+            max-width: 160px;
+            aspect-ratio: 16 / 9;
+            background-image: url("batman-logo.png");
+            background-position: center;
+            background-size: contain;
+            background-repeat: no-repeat;
+            filter:
+                drop-shadow(0 0 16px rgba(0, 0, 0, 0.85))
+                drop-shadow(0 0 26px rgba(255, 224, 155, 0.65))
+                drop-shadow(0 0 40px rgba(78, 139, 255, 0.5));
+        }
+
+        /* Subtext */
+        .hint-text {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.35em;
+            color: var(--text-muted);
+            opacity: 0.9;
+        }
+
+        .hint-text span {
+            font-size: 11px;
+            opacity: 0.7;
+        }
+
+        /* Pulsing indicator under card */
+        .pulse-ring {
+            position: relative;
+            width: 140px;
+            height: 24px;
+            margin-top: 6px;
+            filter: blur(0.7px);
+        }
+
+        .pulse-ring::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background:
+                radial-gradient(circle at 50% 50%, rgba(255, 221, 164, 0.8) 0, transparent 60%);
+            opacity: 0.35;
+            animation: pulseGlow 2.8s ease-out infinite;
+        }
+
+        @keyframes pulseGlow {
+            0% {
+                transform: scale(0.9);
+                opacity: 0.4;
+            }
+            40% {
+                transform: scale(1.05);
+                opacity: 0.7;
+            }
+            100% {
+                transform: scale(1.15);
+                opacity: 0.0;
+            }
+        }
+
+        /* Glow dots around center card for HUD feel */
+        .hud-dots {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .hud-dot {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #ffffff 0, #ffd27f 40%, transparent 70%);
+            box-shadow: 0 0 12px rgba(255, 215, 139, 0.8),
+                        0 0 24px rgba(77, 138, 255, 0.7);
+            opacity: 0.7;
+            animation: flicker 3s ease-in-out infinite alternate;
+        }
+
+        .hud-dot:nth-child(1) {
+            top: 18%;
+            left: 18%;
+            animation-delay: 0s;
+        }
+
+        .hud-dot:nth-child(2) {
+            top: 22%;
+            right: 16%;
+            animation-delay: 0.9s;
+        }
+
+        .hud-dot:nth-child(3) {
+            bottom: 18%;
+            left: 24%;
+            animation-delay: 1.6s;
+        }
+
+        .hud-dot:nth-child(4) {
+            bottom: 22%;
+            right: 20%;
+            animation-delay: 2.3s;
+        }
+
+        @keyframes flicker {
+            0% { opacity: 0.3; transform: scale(0.8); }
+            50% { opacity: 0.8; transform: scale(1); }
+            100% { opacity: 0.4; transform: scale(0.9); }
+        }
+
+        /* OPEN STATE — animation when logo clicked */
+        .logo-wrapper.open .logo-half.left {
+            transform: translate(-65%, -50%) rotateY(-32deg);
+            opacity: 0.98;
+        }
+
+        .logo-wrapper.open .logo-half.right {
+            transform: translate(65%, -50%) rotateY(32deg);
+            opacity: 0.98;
+        }
+
+        .logo-wrapper.open .center-beam {
+            opacity: 1;
+            width: 18px;
+        }
+
+        .logo-wrapper.open .return-panel {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* Mobile tweaks */
+        @media (max-width: 600px) {
+            .center-stack {
+                gap: 18px;
+            }
+            .hud-title {
+                font-size: 11px;
+                letter-spacing: 0.35em;
+            }
+            .return-text {
+                font-size: 20px;
+                letter-spacing: 0.35em;
+            }
+            .hint-text {
+                font-size: 10px;
+                letter-spacing: 0.28em;
+            }
+            .logo-border {
+                border-radius: 26px;
+            }
+            .logo-inner {
+                border-radius: 22px;
+            }
         }
     </style>
 </head>
 <body>
 
-    <div class="content">Get a life vro!</div>
-    <div class="blocked">Please use a larger screen!</div>
+    <!-- Batman UI (desktop + mobile) -->
+    <div class="batman-ui">
+        <div class="hud-dots">
+            <div class="hud-dot"></div>
+            <div class="hud-dot"></div>
+            <div class="hud-dot"></div>
+            <div class="hud-dot"></div>
+        </div>
+
+        <div class="center-stack">
+            <div class="hud-title">GOTHAM CITY // SYSTEM REBOOT</div>
+            <div class="hud-divider"></div>
+
+            <div class="logo-wrapper" id="logoWrapper">
+                <div class="logo-base-glow"></div>
+                <div class="logo-border">
+                    <div class="logo-inner">
+                        <div class="logo-half left"></div>
+                        <div class="logo-half right"></div>
+
+                        <div class="center-beam"></div>
+
+                        <div class="return-panel">
+                            <div class="return-text">I AM BACK</div>
+                            <div class="return-logo"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hint-text">
+                TAP THE SIGNAL TO DEPLOY <span>// BATMAN ONLINE</span>
+            </div>
+
+            <div class="pulse-ring"></div>
+        </div>
+    </div>
 
     <script>
-        function isMobileDevice() {
-            return /Mobi|Android|iPhone|iPad|iPod|Windows Phone/i.test(navigator.userAgent) || 
-                   (window.innerWidth < 1024 && navigator.maxTouchPoints > 0);
-        }
+        document.addEventListener('DOMContentLoaded', function () {
+            const logoWrapper = document.getElementById('logoWrapper');
 
-        function checkDevice() {
-            if (isMobileDevice()) {
-                document.querySelector('.content').style.display = 'none';
-                document.querySelector('.blocked').style.display = 'block';
-            } else {
-                document.querySelector('.content').style.display = 'block';
-                document.querySelector('.blocked').style.display = 'none';
+            if (logoWrapper) {
+                logoWrapper.addEventListener('click', function () {
+                    logoWrapper.classList.toggle('open');
+                });
             }
-        }
-
-        checkDevice();
-        window.addEventListener("resize", checkDevice);
+        });
     </script>
 </body>
 </html>
