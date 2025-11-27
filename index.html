@@ -185,13 +185,33 @@
                 0 0 80px rgba(0, 0, 0, 1);
         }
 
+        /* FULL LOGO (initial state) */
+        .logo-full {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 70%;
+            height: 70%;
+            transform: translate(-50%, -50%);
+            background-image: url("batman-logo.jpeg"); /* your main logo */
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: contain;
+            filter:
+                drop-shadow(0 0 18px rgba(0, 0, 0, 0.95))
+                drop-shadow(0 0 35px rgba(255, 230, 150, 0.45));
+            transition: opacity 0.6s ease;
+        }
+
+        /* HIDDEN HALVES (aligned perfectly until click) */
         .logo-half {
             position: absolute;
             top: 50%;
-            width: 52%;
-            transform: translateY(-50%);
+            left: 50%;
+            width: 70%;
             height: 70%;
-            background-image: url("batman-logo.jpeg"); /* Replace with realistic Batman logo */
+            transform: translate(-50%, -50%);
+            background-image: url("batman-logo.jpeg");
             background-repeat: no-repeat;
             background-position: center;
             background-size: contain;
@@ -204,14 +224,10 @@
         }
 
         .logo-half.left {
-            left: 0;
-            transform-origin: center right;
             clip-path: inset(0 50% 0 0);
         }
 
         .logo-half.right {
-            right: 0;
-            transform-origin: center left;
             clip-path: inset(0 0 0 50%);
         }
 
@@ -306,7 +322,7 @@
             width: 42%;
             max-width: 160px;
             aspect-ratio: 16 / 9;
-            background-image: url("batman-logo.png");
+            background-image: url("batman-logo.jpeg");
             background-position: center;
             background-size: contain;
             background-repeat: no-repeat;
@@ -416,13 +432,17 @@
         }
 
         /* OPEN STATE — animation when logo clicked */
+        .logo-wrapper.open .logo-full {
+            opacity: 0;
+        }
+
         .logo-wrapper.open .logo-half.left {
-            transform: translate(-65%, -50%) rotateY(-32deg);
+            transform: translate(-110%, -50%) rotateY(-32deg);
             opacity: 0.98;
         }
 
         .logo-wrapper.open .logo-half.right {
-            transform: translate(65%, -50%) rotateY(32deg);
+            transform: translate(10%, -50%) rotateY(32deg);
             opacity: 0.98;
         }
 
@@ -481,6 +501,10 @@
                 <div class="logo-base-glow"></div>
                 <div class="logo-border">
                     <div class="logo-inner">
+                        <!-- full logo initially -->
+                        <div class="logo-full"></div>
+
+                        <!-- halves used only in open animation -->
                         <div class="logo-half left"></div>
                         <div class="logo-half right"></div>
 
@@ -515,4 +539,3 @@
     </script>
 </body>
 </html>
-
